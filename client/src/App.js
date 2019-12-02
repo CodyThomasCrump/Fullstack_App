@@ -10,7 +10,7 @@ class App extends Component {
     this.state = {
       data: [],
       message: null,
-      intervalIsSet:false,
+      intervalIsSet: false,
       idToDelete: null,
       idToUpdate: null,
       newMessage: null
@@ -20,7 +20,7 @@ class App extends Component {
   postDataToDB = message => {
     //1. Figure out what ID this message needs to have
     //2. Use Axios to connect to our API server, which will send the data on to our database
-    
+
     let currentIds = this.state.data.map(data => data.id);
     let idToBeAdded = 0;
     while (currentIds.includes(idToBeAdded)) {
@@ -31,7 +31,7 @@ class App extends Component {
       url: 'http://localhost:3001/api/postData',
       method: 'POST',
       data: {
-        id:idToBeAdded,
+        id: idToBeAdded,
         message: message
       }
     }).then((response) => {
@@ -46,6 +46,28 @@ class App extends Component {
   //   //Set up an interval to call the getDataFromDB function every second
   //   setInterval(this.getDataFromDB, 1000);
   // }
+
+  deleteFromDB = idToDelete => {
+    let objIdToDelete = null;
+
+    this.state.data.forEach(dat => {
+      if (String(dat.id) === String(idToDelete)) {
+        objIdToDelete = dat.id;
+      }
+    });
+
+    axios({
+      url: 'http://localhost:3001/api/deleteData',
+      method: 'DELETE',
+      data: {
+        id: objIdToDelete
+      }
+    }).then((response) => {
+      console.log(response);
+    }).catch((error) => {
+      console.log(error);
+    });
+  };
 
   // renderListItems() {
   //   //Destructuring the data object from our state object
@@ -79,12 +101,16 @@ class App extends Component {
             placeholder='Add a New Message to the Database'
             onChange={event => this.setState({ message: event.target.value })}
           />
-          <button onClick={() => this.postDataToDB(this.state.message) }>ADD</button>
+          <button onClick={() => this.postDataToDB(this.state.message)}>ADD</button>
         </div>
 
         <div>
-          <input />
-          <button>DELETE</button>
+          <input
+            type='text'
+            placeholder='Enter ID of Item to Delete'
+            onChange={event => this.setState({ idToDelete: event.target.value })}
+          />
+          <button onClick={() => this.deleteFromDB(this.state.idToDelete)}>DELETE</button>
         </div>
 
         <div>
